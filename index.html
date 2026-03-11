@@ -100,8 +100,7 @@ color:red;
 const scriptURL = "https://script.google.com/macros/s/AKfycbznqA97uGSCb0LyvX7mTElqEXoCX3pduo9RWTuNJrC5BClikIbkcYsEzfLN4E_kBfsE/exec";
 
 let scanner;
-
-let lockScanner = false;
+let lastScanTime = 0;
 
 function startScanner(){
 
@@ -120,9 +119,14 @@ onScanSuccess
 
 function onScanSuccess(decodedText){
 
-if(lockScanner) return;
+let now = Date.now();
 
-lockScanner = true;
+/* delay minimal 1 detik */
+if(now - lastScanTime < 1000){
+return;
+}
+
+lastScanTime = now;
 
 let data = decodedText.split("|");
 
@@ -157,12 +161,6 @@ document.getElementById("status").className="status success";
 
 }
 
-setTimeout(()=>{
-
-lockScanner = false;
-
-},2000);
-
 })
 .catch(err=>{
 
@@ -170,8 +168,6 @@ document.getElementById("status").innerHTML =
 "❌ Gagal koneksi";
 
 document.getElementById("status").className="status error";
-
-lockScanner=false;
 
 });
 
