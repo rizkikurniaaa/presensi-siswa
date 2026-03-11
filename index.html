@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Presensi Siswa</title>
+<script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+
+<body>
+
+<h2>Scan Barcode Presensi</h2>
+
+<div id="reader" style="width:300px"></div>
+
+<p id="result"></p>
+
+<script>
+
+const scriptURL = "https://script.google.com/macros/s/AKfycbzeCpCff-OeFXmuH0fPNXKcUxkEZnl_uwS5XVn-X5vWnEnLfOn-rQru7A9JPHtghRB2/exec";
+
+function onScanSuccess(decodedText) {
+
+    let data = decodedText.split("|");
+
+    let presensi = {
+        no: data[0],
+        nama: data[1],
+        kelas: data[2]
+    };
+
+    fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify(presensi)
+    })
+    .then(res => res.text())
+    .then(res => {
+
+        document.getElementById("result").innerHTML =
+        "Berhasil presensi: " + data[1];
+
+    });
+
+}
+
+let scanner = new Html5QrcodeScanner(
+    "reader",
+    { fps: 10, qrbox: 250 });
+
+scanner.render(onScanSuccess);
+
+</script>
+
+</body>
+</html>
