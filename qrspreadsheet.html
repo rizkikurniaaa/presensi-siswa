@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>QR Generator dari Spreadsheet</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+text-align:center;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,120px);
+gap:20px;
+margin:20px;
+}
+
+.card{
+background:white;
+padding:10px;
+border-radius:8px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>QR Generator Siswa</h2>
+
+<button onclick="loadData()">Ambil Data dari Spreadsheet</button>
+
+<div id="hasil" class="grid"></div>
+
+<script>
+
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS_iLwQV8r6zwacACYTjybloXhY8zmyY8Muh8pDXAsnSufNJopAUHec6GNoU4Y4pFMXWPVhSc1RGK0e/pub?output=csv";
+
+function loadData(){
+
+fetch(sheetURL)
+.then(res=>res.text())
+.then(data=>{
+
+let json = JSON.parse(data.substr(47).slice(0,-2));
+
+let rows = json.table.rows;
+
+let hasil = document.getElementById("hasil");
+
+hasil.innerHTML="";
+
+rows.forEach(r=>{
+
+let no = r.c[0].v;
+let nama = r.c[1].v;
+let kelas = r.c[2].v;
+
+let text = no+"|"+nama+"|"+kelas;
+
+let card = document.createElement("div");
+card.className="card";
+
+let qr = document.createElement("div");
+
+card.appendChild(qr);
+
+let label = document.createElement("p");
+label.innerText = nama;
+
+card.appendChild(label);
+
+hasil.appendChild(card);
+
+new QRCode(qr,{
+text:text,
+width:100,
+height:100
+});
+
+});
+
+});
+
+}
+
+</script>
+
+</body>
+
+</html>
