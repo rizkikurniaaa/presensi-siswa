@@ -1,51 +1,159 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Presensi Siswa</title>
+
 <script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+text-align:center;
+margin:0;
+}
+
+.header{
+background:#2c7be5;
+color:white;
+padding:15px;
+font-size:20px;
+}
+
+.container{
+padding:20px;
+}
+
+.card{
+background:white;
+border-radius:10px;
+padding:20px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+button{
+background:#2c7be5;
+border:none;
+padding:12px 20px;
+color:white;
+font-size:16px;
+border-radius:8px;
+cursor:pointer;
+margin-bottom:10px;
+}
+
+#reader{
+margin:auto;
+width:300px;
+}
+
+.status{
+margin-top:15px;
+font-size:18px;
+font-weight:bold;
+}
+
+.success{
+color:green;
+}
+
+.error{
+color:red;
+}
+
+</style>
+
 </head>
 
 <body>
 
-<h2>Scan Barcode Presensi</h2>
+<div class="header">
+📚 Presensi Siswa
+</div>
 
-<div id="reader" style="width:300px"></div>
+<div class="container">
 
-<p id="result"></p>
+<div class="card">
+
+<button onclick="startScanner()">Mulai Scan</button>
+
+<div id="reader"></div>
+
+<div id="status" class="status"></div>
+
+</div>
+
+</div>
+
+<audio id="beep">
+<source src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg">
+</audio>
 
 <script>
 
-const scriptURL = "https://script.google.com/macros/s/AKfycbzeCpCff-OeFXmuH0fPNXKcUxkEZnl_uwS5XVn-X5vWnEnLfOn-rQru7A9JPHtghRB2/exec";
+const scriptURL = "URL_APPS_SCRIPT";
 
-function onScanSuccess(decodedText) {
+let scanner;
 
-    let data = decodedText.split("|");
+function startScanner(){
 
-    let presensi = {
-        no: data[0],
-        nama: data[1],
-        kelas: data[2]
-    };
+scanner = new Html5Qrcode("reader");
 
-    fetch(scriptURL, {
-        method: "POST",
-        body: JSON.stringify(presensi)
-    })
-    .then(res => res.text())
-    .then(res => {
-
-        document.getElementById("result").innerHTML =
-        "Berhasil presensi: " + data[1];
-
-    });
+scanner.start(
+{ facingMode: "environment" },
+{
+fps:20,
+qrbox:250
+},
+onScanSuccess
+);
 
 }
 
-let scanner = new Html5QrcodeScanner(
-    "reader",
-    { fps: 10, qrbox: 250 });
+function onScanSuccess(decodedText){
 
-scanner.render(onScanSuccess);
+let data = decodedText.split("|");
+
+let presensi = {
+no:data[0],
+nama:data[1],
+kelas:data[2]
+};
+
+fetch(scriptURL,{
+method:"POST",
+body:JSON.stringify(presensi)
+})
+.then(res=>res.text())
+.then(res=>{
+
+if(res=="SUDAH_ABSEN"){
+
+document.getElementById("status").innerHTML =
+"⚠️ "+data[1]+" sudah absen hari ini";
+
+document.getElementById("status").className =
+"status error";
+
+}else{
+
+document.getElementById("beep").play();
+
+document.getElementById("status").innerHTML =
+"✅ Hadir: "+data[1]+" ("+data[2]+")";
+
+document.getElementById("status").className =
+"status success";
+
+}
+
+});
+
+}
 
 </script>
 
