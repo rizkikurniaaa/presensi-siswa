@@ -97,7 +97,7 @@ color:red;
 
 <script>
 
-const scriptURL = "https://script.google.com/macros/s/AKfycbznqA97uGSCb0LyvX7mTElqEXoCX3pduo9RWTuNJrC5BClikIbkcYsEzfLN4E_kBfsE/exec";
+const scriptURL = "URL_APPS_SCRIPT";
 
 let scanner;
 let lastScanTime = 0;
@@ -138,10 +138,6 @@ kelas:data[2]
 
 fetch(scriptURL,{
 method:"POST",
-mode:"no-cors"
-headers:{
-"Content-Type":"application/json"
-},
 body:JSON.stringify(presensi)
 })
 .then(res=>res.text())
