@@ -136,8 +136,11 @@ nama:data[1],
 kelas:data[2]
 };
 
-fetch("https://script.google.com/macros/s/AKfycbznqA97uGSCb0LyvX7mTElqEXoCX3pduo9RWTuNJrC5BClikIbkcYsEzfLN4E_kBfsE/exec",{
+fetch(scriptURL,{
 method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
 body:JSON.stringify(presensi)
 })
 .then(res=>res.text())
